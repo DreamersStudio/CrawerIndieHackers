@@ -6,12 +6,18 @@ def get_article_links(url):
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
-        # ***  请根据你在浏览器开发者工具中分析的结果，修改以下选择器  ***
-        article_elements = soup.find_all('div', class_='ember-view') #  <--- 示例选择器 选择需要爬取的文章链接父层div element的class!!!
+        #  ***  更新的选择器：使用 class_='ember-view' 的 div 元素  ***
+        article_elements = soup.find_all('div', class_='ember-view') # <--- 需爬取页面链接的父层DIV class !!!
         for article_element in article_elements:
-            link_tag = article_element.find('a') #  再次假设链接在 <a> 标签里
+            link_tag = article_element.find('a') # 再次假设链接在 <a> 标签里
             if link_tag and link_tag.has_attr('href'):
-                article_url = "https://www.indiehackers.com" + link_tag['href'] #  拼接成完整的 URL
+                href = link_tag['href'] # 获取 <a> 标签的 href 属性值
+                #  判断 href 是否为绝对 URL 或相对 URL
+                if href.startswith("http"): # 如果是绝对 URL，直接使用
+                    article_url = href
+                else: # 如果是相对 URL，拼接成完整的 URL
+                    article_url = "https://www.indiehackers.com" + href
+
                 #  新增代码： 检查链接是否以 '/post/' 开头，并且是 indiehackers 域名下的
                 if article_url.startswith("https://www.indiehackers.com/post/"):
                     article_links.append(article_url)
