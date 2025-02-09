@@ -7,12 +7,14 @@ def get_article_links(url):
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
         # ***  请根据你在浏览器开发者工具中分析的结果，修改以下选择器  ***
-        article_elements = soup.find_all('div', class_='ember-view') #  <--- 示例选择器，需要修改 !!!
+        article_elements = soup.find_all('div', class_='ember-view') #  <--- 示例选择器 选择需要爬取的文章链接父层div element的class!!!
         for article_element in article_elements:
             link_tag = article_element.find('a') #  再次假设链接在 <a> 标签里
             if link_tag and link_tag.has_attr('href'):
                 article_url = "https://www.indiehackers.com" + link_tag['href'] #  拼接成完整的 URL
-                article_links.append(article_url)
+                #  新增代码： 检查链接是否以 '/post/' 开头，并且是 indiehackers 域名下的
+                if article_url.startswith("https://www.indiehackers.com/post/"):
+                    article_links.append(article_url)
     else:
         print(f"Failed to fetch URL: {url}, status code: {response.status_code}")
     return article_links
